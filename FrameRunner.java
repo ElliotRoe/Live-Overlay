@@ -1,8 +1,12 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.awt.Font;
+import java.awt.FontFormatException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -10,14 +14,15 @@ import javax.swing.SwingConstants;
 
 public class FrameRunner {
 
-	private static LiveText liveString;
+	private static LiveText liveCost;
+	private static LiveText liveTitle;
 
 	private static double xCoor = 0, yCoor = 0;
 
 	private static JFrame mainOverlay;
 	private static JLabel liveLabel;
 
-	private static int width = 200, height = 100;
+	private static int width = (int) (754f * (100f / 309f)), height = (int) (309 * (100f / 309f));
 	private static double screenWidth, screenHeight;
 
 	public static void main(String[] args) {
@@ -26,7 +31,9 @@ public class FrameRunner {
 	}
 
 	private static void update() {
-		// TODO Auto-generated method stub
+		for (;;) {
+			liveLabel.setText(liveCost.toString());
+		}
 
 	}
 
@@ -41,15 +48,34 @@ public class FrameRunner {
 		yCoor = screenHeight - height;
 
 		mainOverlay = new JFrame("Overlay");
-		liveLabel = new JLabel(liveString.toString(), SwingConstants.CENTER);
+		liveCost = new BPSetCost("21002-1");
+		liveTitle = new BPSetTitle("21002-1");
 
-		Font segoeBold = Font.createFont(Font.TRUETYPE_FONT, new File("/data/segoe-ui-bold.ttf"));
+		liveCost.start();
+		liveTitle.start();
+
+		liveLabel = new JLabel(liveCost.toString(), SwingConstants.CENTER);
+
+		Font segoeBold = null;
+		File f = null;
+		try {
+			f = new File("segoe-ui-bold.ttf");
+			FileInputStream input = new FileInputStream(f);
+			segoeBold = Font.createFont(Font.TRUETYPE_FONT, input);
+
+		} catch (FontFormatException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Whoops FontFormatException");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Whoops IOException");
+		}
 
 		liveLabel.setOpaque(false);
 		liveLabel.setForeground(Color.white);
-		liveLabel.setFont(segoeBold);
+		liveLabel.setFont(segoeBold.deriveFont(40f));
 
-		mainOverlay.getContentPane().setBackground(new Color(7, 27, 45));
+		mainOverlay.getContentPane().setBackground(new Color(6, 27, 45));
 
 		mainOverlay.setUndecorated(true);
 		mainOverlay.setAlwaysOnTop(true);
@@ -58,6 +84,9 @@ public class FrameRunner {
 		mainOverlay.getRootPane().putClientProperty("apple.awt.draggableWindowBackground", false);
 
 		mainOverlay.setSize(width, height);
+		mainOverlay.add(liveLabel, BorderLayout.CENTER);
+		mainOverlay.setLocation((int) xCoor - 5, (int) yCoor - 40);
+		mainOverlay.setVisible(true);
 
 	}
 
